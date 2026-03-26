@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Veyrbound App – Next Stage</title>
+<style>
+  :root{
+    --bg:#070707; --panel:#111; --panel2:#171717; --line:#3a0f0f;
+    --text:#ededed; --muted:#a7a7a7; --red:#c41212; --red2:#ff4b4b;
+    --blue:#8fc7ff; --gold:#d7c98b; --ok:#7dd38b; --warn:#ffb347;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; color:var(--text); font-family:Inter,system-ui,Arial,sans-serif;
+    background:
+      radial-gradient(circle at top, rgba(196,18,18,.12), transparent 34%),
+      linear-gradient(180deg,#0a0a0a,#050505);
+    min-height:100vh;
+  }
+  .app{max-width:1100px;margin:0 auto;padding:18px}
+  h1,h2,h3{margin:0}
+  .title{text-align:center;margin:8px 0 18px}
+  .title h1{color:var(--red2);text-transform:uppercase;letter-spacing:.14em;font-size:2rem}
+  .title p{color:var(--muted);margin-top:6px}
+  .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
+  .card{
+    background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));
+    border:1px solid var(--line);border-radius:16px;padding:16px;
+    box-shadow:0 0 0 1px rgba(255,0,0,.04) inset, 0 10px 30px rgba(0,0,0,.35);
+  }
+  .card h2{font-size:1rem;color:#fff;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+  .stats{display:grid;gap:12px}
+  .stat .row{display:flex;justify-content:space-between;margin-bottom:5px}
+  .label{color:var(--muted)}
+  .bar{width:100%;height:14px;background:#1f1f1f;border:1px solid #2a2a2a;border-radius:999px;overflow:hidden}
+  .fill{height:100%;transition:width .2s ease}
+  .hp{background:linear-gradient(90deg,#5f0000,var(--red2))}
+  .focus{background:linear-gradient(90deg,#27435b,var(--blue))}
+  .hunger{background:linear-gradient(90deg,#5a1a1a,#ff6a00)}
+  .mini{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+  .pill{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+  .pill .n{font-size:1.15rem;font-weight:700}
+  .controls,.abilities,.enemy-list{display:grid;gap:10px}
+  .row-buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  button,input,select{
+    width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line);
+    background:#121212;color:var(--text);
+  }
+  button{cursor:pointer;font-weight:700}
+  button:hover{background:#181818}
+  button.primary{background:linear-gradient(180deg,#1e0d0d,#120808);color:#ffdede}
+  button.light{border-color:#31495f;color:#dcefff}
+  button.good{border-color:#234628;color:#d7ffe0}
+  .ability,.enemy{
+    border:1px solid #262626;border-radius:14px;padding:12px;background:#0f0f0f
+  }
+  .ability h3,.enemy h3{font-size:1rem;margin-bottom:6px}
+  .ability p,.enemy p{margin:0;color:var(--muted);line-height:1.35}
+  .tag{display:inline-block;margin-left:8px;font-size:.78rem;color:#111;background:var(--gold);padding:2px 8px;border-radius:999px}
+  .tag.red{background:#ff8a8a}.tag.blue{background:#bfe1ff}.tag.gray{background:#d0d0d0}
+  .log{
+    min-height:220px;max-height:420px;overflow:auto;background:#090909;border:1px solid #1d1d1d;
+    border-radius:12px;padding:12px;font-family:ui-monospace,SFMono-Regular,monospace
+  }
+  .log-entry{margin:0 0 10px;line-height:1.4}
+  .muted{color:var(--muted)}
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;z-index:50}
+  .overlay.show{display:flex}
+  .modal{
+    width:min(92vw,560px);background:#090909;border:1px solid var(--line);border-radius:18px;padding:18px;
+    box-shadow:0 0 30px rgba(196,18,18,.25)
+  }
+  .modal h3{color:var(--red2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+  .glitch{text-shadow:1px 0 0 rgba(255,0,0,.45), -1px 0 0 rgba(255,255,255,.06)}
+  .small{font-size:.88rem}
+  .footer{margin-top:10px;color:var(--muted);font-size:.88rem}
+  @media (max-width:900px){.grid{grid-template-columns:1fr}.mini{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="title">
+    <h1 class="glitch">Dark (Alrik) – Veyrbound</h1>
+    <p>Next Stage • Save/Load • Gegner-Tracker • Würfel • Veyr-Flüstern • Installierbar als lokale Datei</p>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Status</h2>
+      <div class="stats">
+        <div class="stat"><div class="row"><span class="label">HP</span><strong id="hpText"></strong></div><div class="bar"><div class="fill hp" id="hpBar"></div></div></div>
+        <div class="stat"><div class="row"><span class="label">Focus 🌕</span><strong id="focusText"></strong></div><div class="bar"><div class="fill focus" id="focusBar"></div></div></div>
+        <div class="stat"><div class="row"><span class="label">Hunger 🌑</span><strong id="hungerText"></strong></div><div class="bar"><div class="fill hunger" id="hungerBar"></div></div></div>
+      </div>
+      <div class="mini">
+        <div class="pill"><div class="label">Scars</div><div class="n" id="scarText"></div></div>
+        <div class="pill"><div class="label">AC</div><div class="n" id="acText"></div></div>
+        <div class="pill"><div class="label">Attack</div><div class="n">+5</div></div>
+        <div class="pill"><div class="label">Damage</div><div class="n">2W6+3</div></div>
+      </div>
+      <div class="footer">Faustregel: <span style="color:var(--blue)">Licht = Kontrolle</span> • <span style="color:var(--warn)">Veyr = Schaden</span></div>
+    </div>
+
+    <div class="card">
+      <h2>Schnellaktionen</h2>
+      <div class="controls">
+        <div class="row-buttons">
+          <button class="light" onclick="useLight('lichtstoss')">🌕 Lichtstoß</button>
+          <button class="light" onclick="useLight('reinigung')">✨ Reinigung</button>
+        </div>
+        <div class="row-buttons">
+          <button class="light" onclick="useLight('lichtfeld')">🛡️ Lichtfeld</button>
+          <button class="light" onclick="useLight('klarer')">🧠 Klarer Geist</button>
+        </div>
+        <div class="row-buttons">
+          <button class="primary" onclick="useVeyr('schlag')">🌑 Veyr-Schlag</button>
+          <button class="primary" onclick="useVeyr('echo')">💀 Echo des Opfers</button>
+        </div>
+        <div class="row-buttons">
+          <button class="primary" onclick="useVeyr('griff')">🩸 Griff der Tiefe</button>
+          <button class="primary" onclick="useVeyr('fluestern')">👁️ Flüstern</button>
+        </div>
+        <div class="row-buttons">
+          <button onclick="endTurn()">⏭️ Zug beenden</button>
+          <button class="good" onclick="shortRest()">🛌 Kurze Rast</button>
+        </div>
+        <div class="row-buttons">
+          <button onclick="rollAttack()">🎲 Angriff würfeln</button>
+          <button onclick="rollDamage()">🎲 Schaden würfeln</button>
+        </div>
+        <div class="row-buttons">
+          <button onclick="toggleSound()">🔊 Sound an/aus</button>
+          <button onclick="resetState()">♻️ Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid" style="margin-top:16px;">
+    <div class="card">
+      <h2>Gegner-Tracker</h2>
+      <div class="row-buttons">
+        <input id="enemyName" placeholder="Name des Gegners" />
+        <input id="enemyHp" type="number" placeholder="HP" />
+      </div>
+      <div class="row-buttons" style="margin-top:10px;">
+        <button onclick="addEnemy()">➕ Gegner hinzufügen</button>
+        <button onclick="clearEnemies()">🗑️ Alle Gegner löschen</button>
+      </div>
+      <div class="enemy-list" id="enemyList" style="margin-top:12px;"></div>
+    </div>
+
+    <div class="card">
+      <h2>Speichern / Laden</h2>
+      <div class="row-buttons">
+        <button onclick="saveState()">💾 Lokal speichern</button>
+        <button onclick="loadState()">📂 Laden</button>
+      </div>
+      <div class="row-buttons" style="margin-top:10px;">
+        <button onclick="exportState()">📤 Export JSON</button>
+        <button onclick="importState()">📥 Import JSON</button>
+      </div>
+      <div class="footer">Speichert HP, Focus, Hunger, Scars und Gegner lokal im Browser.</div>
+    </div>
+  </div>
+
+  <div class="grid" style="margin-top:16px;">
+    <div class="card">
+      <h2>Lichtfähigkeiten</h2>
+      <div class="abilities">
+        <div class="ability"><h3>Lichtstoß <span class="tag blue">1 Focus</span></h3><p>+1W4 Schaden. Ziel kann nicht reagieren.</p></div>
+        <div class="ability"><h3>Lichtfeld <span class="tag blue">2 Focus</span></h3><p>Kontrollzone, verlangsamt Gegner.</p></div>
+        <div class="ability"><h3>Reinigung <span class="tag blue">2 Focus</span></h3><p>Heilt 1W6 oder reduziert Hunger um 1.</p></div>
+        <div class="ability"><h3>Klarer Geist <span class="tag blue">1 Focus</span></h3><p>+2 auf Kontrollwurf.</p></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Veyrfähigkeiten</h2>
+      <div class="abilities">
+        <div class="ability"><h3>Veyr-Schlag <span class="tag red">HP oder Hunger</span></h3><p>+1W6 Schaden. Zahle 3 HP oder +1 Hunger.</p></div>
+        <div class="ability"><h3>Echo des Opfers <span class="tag red">+1 Hunger</span></h3><p>+1W6 gegen geschwächte Gegner. Kill kann Kontrolle fordern.</p></div>
+        <div class="ability"><h3>Griff der Tiefe <span class="tag red">+1 Hunger</span></h3><p>+1W6, Ziel fixiert, du bleibst gebunden.</p></div>
+        <div class="ability"><h3>Flüstern der Tiefe <span class="tag red">+1 Hunger</span></h3><p>Vorteil oder +2 Kontrolle. Eskalation wird gefährlicher.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <h2>Log</h2>
+    <div class="log" id="log"></div>
+    <div class="small muted" style="margin-top:8px;">Eskalation und Veyr-Flüstern werden automatisch ausgelöst.</div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h3 id="modalTitle">Veyr flüstert</h3>
+    <p id="modalText">...</p>
+    <div class="row-buttons" style="margin-top:14px;">
+      <button class="primary" onclick="closeModal()">Weiter</button>
+      <button onclick="recoverControl()">Kontrolle suchen</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = "veyrbound_next_stage_v1";
+const state = {
+  hp: 9, hpMax: 33,
+  focus: 3, focusMax: 8,
+  hunger: 4, hungerMax: 10,
+  scars: 0, ac: 17,
+  turnsWithoutLight: 0,
+  sound: true,
+  nextEscPenalty: false,
+  enemies: []
+};
+
+const whispers = [
+  "Noch ein Schritt.",
+  "Licht hält dich nur auf.",
+  "Du weißt, wie schnell ich sein kann.",
+  "Sieh, wie leicht alles bricht.",
+  "Du musst nur loslassen."
+];
+const scarEffects = ["Angriffszwang", "Freeze", "Flashback"];
+
+function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+function d4(){ return Math.floor(Math.random()*4)+1; }
+function d6(){ return Math.floor(Math.random()*6)+1; }
+function d20(){ return Math.floor(Math.random()*20)+1; }
+
+function beep(freq=220,time=0.08,type="sine",gain=0.035){
+  if(!state.sound) return;
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator(), g = ctx.createGain();
+    osc.type = type; osc.frequency.value = freq;
+    osc.connect(g); g.connect(ctx.destination); g.gain.value = gain;
+    osc.start(); osc.stop(ctx.currentTime + time);
+  }catch(e){}
+}
+
+function log(msg){
+  const box = document.getElementById("log");
+  const el = document.createElement("div");
+  el.className = "log-entry";
+  el.textContent = "• " + msg;
+  box.prepend(el);
+}
+
+function updateUI(){
+  document.getElementById("hpText").textContent = `${state.hp} / ${state.hpMax}`;
+  document.getElementById("focusText").textContent = `${state.focus} / ${state.focusMax}`;
+  document.getElementById("hungerText").textContent = `${state.hunger} / ${state.hungerMax}`;
+  document.getElementById("scarText").textContent = state.scars;
+  document.getElementById("acText").textContent = state.ac;
+  document.getElementById("hpBar").style.width = `${state.hp / state.hpMax * 100}%`;
+  document.getElementById("focusBar").style.width = `${state.focus / state.focusMax * 100}%`;
+  document.getElementById("hungerBar").style.width = `${state.hunger / state.hungerMax * 100}%`;
+  renderEnemies();
+}
+
+function showModal(title, text){
+  document.getElementById("modalTitle").textContent = title;
+  document.getElementById("modalText").textContent = text;
+  document.getElementById("overlay").classList.add("show");
+}
+function closeModal(){ document.getElementById("overlay").classList.remove("show"); }
+
+function maybeWhisper(){
+  if(state.hunger >= 4 && Math.random() < 0.35){
+    showModal("Veyr flüstert", whispers[Math.floor(Math.random()*whispers.length)]);
+    beep(170, .15, "sawtooth", .04);
+  }
+}
+
+function recoverControl(){
+  closeModal();
+  const roll = d20();
+  if(roll >= 15){
+    log(`Kontrolle zurückgeholt. (Wurf ${roll})`);
+    beep(520,.12,"triangle",.03);
+  } else if (roll >= 10){
+    log(`Teilkontrolle. (Wurf ${roll})`);
+    beep(360,.12,"triangle",.03);
+  } else {
+    log(`Veyr bleibt dominant. (Wurf ${roll})`);
+    beep(140,.18,"sawtooth",.045);
+  }
+}
+
+function triggerScar(){
+  if(state.hunger >= 6){
+    const roll = d6();
+    if(roll <= 2){
+      const effect = scarEffects[Math.floor(Math.random()*scarEffects.length)];
+      showModal("Narbe aktiviert", effect);
+      log(`Scar-Trigger: ${effect}.`);
+      beep(130,.2,"square",.04);
+    }
+  }
+}
+
+function useLight(kind){
+  let cost = 0, name = "";
+  if(kind === "lichtstoss"){ cost = 1; name = "Lichtstoß"; }
+  if(kind === "lichtfeld"){ cost = 2; name = "Lichtfeld"; }
+  if(kind === "reinigung"){ cost = 2; name = "Reinigung"; }
+  if(kind === "klarer"){ cost = 1; name = "Klarer Geist"; }
+
+  if(state.focus < cost){ log("Nicht genug Focus."); beep(120,.12,"square",.03); return; }
+
+  if(state.hunger >= 6){
+    const dc = 10 + Math.floor(state.hunger/2);
+    const roll = d20();
+    if(roll < dc){
+      state.focus -= cost;
+      state.turnsWithoutLight = 0;
+      log(`${name} scheitert. Wurf ${roll} gegen SG ${dc}.`);
+      beep(110,.18,"sawtooth",.04);
+      updateUI();
+      return;
+    }
+  }
+
+  state.focus -= cost;
+  state.turnsWithoutLight = 0;
+
+  if(kind === "reinigung"){
+    const choice = confirm("OK = 1W6 Heilung, Abbrechen = Hunger -1");
+    if(choice){
+      const heal = d6();
+      state.hp = clamp(state.hp + heal, 0, state.hpMax);
+      log(`Reinigung heilt ${heal} HP.`);
+      beep(600,.1,"triangle",.02);
+    } else {
+      state.hunger = clamp(state.hunger - 1, 0, state.hungerMax);
+      log("Reinigung senkt Hunger um 1.");
+      beep(540,.1,"triangle",.02);
+    }
+  } else {
+    log(`${name} eingesetzt.`);
+    beep(520,.08,"triangle",.02);
+  }
+
+  updateUI();
+}
+
+function useVeyr(kind){
+  if(kind === "schlag"){
+    const hpPay = confirm("OK = 3 HP zahlen, Abbrechen = +1 Hunger");
+    if(hpPay){
+      state.hp = clamp(state.hp - 3, 0, state.hpMax);
+      log("Veyr-Schlag: 3 HP geopfert, +1W6 Schaden.");
+    } else {
+      state.hunger = clamp(state.hunger + 1, 0, state.hungerMax);
+      log("Veyr-Schlag: Hunger +1, +1W6 Schaden.");
+    }
+  }
+  if(kind === "echo"){
+    state.hunger = clamp(state.hunger + 1, 0, state.hungerMax);
+    log("Echo des Opfers: Hunger +1, +1W6 gegen geschwächte Gegner.");
+  }
+  if(kind === "griff"){
+    state.hunger = clamp(state.hunger + 1, 0, state.hungerMax);
+    log("Griff der Tiefe: Hunger +1, Ziel fixiert.");
+  }
+  if(kind === "fluestern"){
+    state.hunger = clamp(state.hunger + 1, 0, state.hungerMax);
+    state.nextEscPenalty = true;
+    log("Flüstern der Tiefe: Hunger +1, nächste Eskalation schlechter.");
+    showModal("Veyr flüstert", whispers[Math.floor(Math.random()*whispers.length)]);
+  }
+  beep(180,.15,"sawtooth",.04);
+  updateUI();
+}
+
+function endTurn(){
+  if(state.turnsWithoutLight >= 1){
+    state.focus = clamp(state.focus - 1, 0, state.focusMax);
+    log("Focus verfällt um 1 (Licht nicht genutzt).");
+  }
+  state.turnsWithoutLight += 1;
+
+  if(state.hunger >= 6){
+    let roll = d6();
+    if(state.nextEscPenalty){ roll = Math.max(1, roll - 1); state.nextEscPenalty = false; }
+    if(roll <= 2){
+      log(`Eskalation ${roll}: Kontrollverlust droht.`);
+      showModal("Kontrollverlust", "Veyr drückt gegen deine Kontrolle.");
+      beep(130,.2,"square",.05);
+    } else if (roll >= 5){
+      log(`Eskalation ${roll}: Nächster Angriff +1W4 Schaden.`);
+      beep(300,.08,"sine",.03);
+    } else {
+      log(`Eskalation ${roll}: Kein Zusatzeffekt.`);
+    }
+    triggerScar();
+  }
+
+  maybeWhisper();
+  updateUI();
+}
+
+function shortRest(){
+  state.focus = clamp(state.focus + 3, 0, state.focusMax);
+  state.hunger = clamp(state.hunger - 1, 0, state.hungerMax);
+  log("Kurze Rast: Focus +3, Hunger -1.");
+  beep(620,.12,"triangle",.02);
+  updateUI();
+}
+
+function rollAttack(){
+  const roll = d20();
+  log(`Angriffswurf: ${roll} + 5 = ${roll + 5}`);
+  beep(420,.06,"triangle",.02);
+}
+
+function rollDamage(){
+  const a = d6(), b = d6();
+  const total = a + b + 3;
+  log(`Schaden: ${a} + ${b} + 3 = ${total}`);
+  beep(360,.06,"triangle",.02);
+}
+
+function addEnemy(){
+  const name = document.getElementById("enemyName").value.trim();
+  const hp = parseInt(document.getElementById("enemyHp").value, 10);
+  if(!name || !hp){ log("Gegnername und HP eingeben."); return; }
+  state.enemies.push({id: crypto.randomUUID(), name, hp});
+  document.getElementById("enemyName").value = "";
+  document.getElementById("enemyHp").value = "";
+  log(`Gegner hinzugefügt: ${name} (${hp} HP).`);
+  updateUI();
+}
+
+function renderEnemies(){
+  const box = document.getElementById("enemyList");
+  box.innerHTML = "";
+  state.enemies.forEach(enemy => {
+    const el = document.createElement("div");
+    el.className = "enemy";
+    el.innerHTML = `
+      <h3>${enemy.name} <span class="tag gray">${enemy.hp} HP</span></h3>
+      <div class="row-buttons" style="margin-top:8px;">
+        <button onclick="damageEnemy('${enemy.id}')">- Schaden</button>
+        <button onclick="healEnemy('${enemy.id}')">+ HP</button>
+      </div>
+    `;
+    box.appendChild(el);
+  });
+}
+
+function damageEnemy(id){
+  const val = parseInt(prompt("Wie viel Schaden?"), 10);
+  if(!val && val !== 0) return;
+  const enemy = state.enemies.find(e => e.id === id);
+  if(!enemy) return;
+  enemy.hp = Math.max(0, enemy.hp - val);
+  log(`${enemy.name} erleidet ${val} Schaden.`);
+  if(enemy.hp === 0) log(`${enemy.name} ist besiegt.`);
+  updateUI();
+}
+
+function healEnemy(id){
+  const val = parseInt(prompt("Wie viel Heilung?"), 10);
+  if(!val && val !== 0) return;
+  const enemy = state.enemies.find(e => e.id === id);
+  if(!enemy) return;
+  enemy.hp = Math.max(0, enemy.hp + val);
+  log(`${enemy.name} heilt ${val} HP.`);
+  updateUI();
+}
+
+function clearEnemies(){
+  state.enemies = [];
+  log("Alle Gegner gelöscht.");
+  updateUI();
+}
+
+function saveState(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  log("Status lokal gespeichert.");
+}
+
+function loadState(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(!raw){ log("Kein Speicherstand gefunden."); return; }
+  const data = JSON.parse(raw);
+  Object.assign(state, data);
+  log("Speicherstand geladen.");
+  updateUI();
+}
+
+function exportState(){
+  const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "veyrbound-save.json";
+  a.click();
+  log("Export erstellt.");
+}
+
+function importState(){
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = ".json,application/json";
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = evt => {
+      try{
+        const data = JSON.parse(evt.target.result);
+        Object.assign(state, data);
+        log("Import geladen.");
+        updateUI();
+      }catch(err){
+        log("Import fehlgeschlagen.");
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function toggleSound(){
+  state.sound = !state.sound;
+  log(`Sound ${state.sound ? "aktiviert" : "deaktiviert"}.`);
+}
+
+function resetState(){
+  if(!confirm("Alles zurücksetzen?")) return;
+  state.hp = 9; state.focus = 3; state.hunger = 4; state.scars = 0;
+  state.turnsWithoutLight = 0; state.nextEscPenalty = false; state.enemies = [];
+  log("Status zurückgesetzt.");
+  updateUI();
+}
+
+updateUI();
+log("Bereit. Veyr hört zu.");
+</script>
+</body>
+</html>
