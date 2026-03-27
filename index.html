@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dark (Alrik) – Veyrbound Final Core</title>
+  <title>Dark (Alrik) – Fighter / Veyrbound Final</title>
   <style>
     :root{
       --bg:#060606;
@@ -32,7 +32,7 @@
       padding:12px;
     }
 
-    .wrap{max-width:1400px;margin:0 auto}
+    .wrap{max-width:1450px;margin:0 auto}
 
     .topbar{
       display:flex;
@@ -60,7 +60,7 @@
       padding:10px 12px;
       font-size:13px;
       color:var(--muted);
-      min-width:170px;
+      min-width:180px;
       text-align:center;
     }
 
@@ -190,6 +190,7 @@
     }
 
     button:hover{filter:brightness(1.06)}
+    button:disabled{opacity:.45;cursor:not-allowed}
 
     .light-btn{
       background:linear-gradient(180deg,#5a4917,#3f3310);
@@ -201,6 +202,12 @@
       background:linear-gradient(180deg,#68141d,#471015);
       border-color:#9c2230;
       color:#ffd5da;
+    }
+
+    .fighter-btn{
+      background:linear-gradient(180deg,#23445d,#183043);
+      border-color:#325f84;
+      color:#dff3ff;
     }
 
     .util-btn{
@@ -283,8 +290,8 @@
   <div class="wrap">
     <div class="topbar">
       <div>
-        <h1>DARK (ALRIK) – VEYRBOUND</h1>
-        <div class="sub">Final Core • Dual Core Brutal • Berserk Mode • Scar Mutations • Multi Enemy • Boss • Inventory</div>
+        <h1>DARK (ALRIK) – FIGHTER / VEYRBOUND</h1>
+        <div class="sub">Final Fighter Edition • D&D 5e Fighter Core • Veyrbound Subclass • Dual Core Brutal</div>
       </div>
       <div class="save" id="saveIndicator">Autosave bereit</div>
     </div>
@@ -294,7 +301,9 @@
     <div class="grid">
       <section class="card span-4">
         <h2>Charakterbogen</h2>
-        <div class="small">Fighter 3 • Veyrbound • EXP <span id="exp">450</span> / 900</div>
+        <div class="small">
+          Hauptklasse: Fighter <span id="fighterLevel">3</span> • Subklasse: Veyrbound • EXP <span id="exp">450</span> / 900
+        </div>
 
         <div class="stats">
           <div class="stat">
@@ -343,37 +352,46 @@
       </section>
 
       <section class="card span-8">
-        <h2>Kampf / Runde</h2>
+        <h2>Fighter-Kern (D&D 5e)</h2>
+
         <div class="three">
           <div>
-            <div class="small">Runde</div>
-            <div style="font-size:28px;font-weight:700;"><span id="round">1</span></div>
+            <label class="small">Fighter Level</label>
+            <select id="fighterLevelSelect" onchange="setFighterLevel()">
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+            </select>
           </div>
           <div>
-            <div class="small">Light genutzt</div>
-            <div style="font-size:18px;font-weight:700;" id="usedLight">Nein</div>
+            <label class="small">Fighting Style</label>
+            <select id="fightingStyleSelect" onchange="setFightingStyle()">
+              <option value="defense">Defense</option>
+              <option value="dueling">Dueling</option>
+              <option value="gwf">Great Weapon Fighting</option>
+            </select>
           </div>
           <div>
-            <div class="small">Veyr genutzt</div>
-            <div style="font-size:18px;font-weight:700;" id="usedVeyr">Nein</div>
+            <label class="small">Fighter Actions diese Runde</label>
+            <div style="font-size:26px;font-weight:700;padding-top:6px;"><span id="actionsRemaining">1</span></div>
           </div>
         </div>
 
         <div class="row">
-          <button class="util-btn" onclick="basicAttack()">⚔️ Standardangriff</button>
-          <button class="util-btn" onclick="defensiveStance()">🛡 Defensive Haltung</button>
-          <button class="util-btn" onclick="shortRecovery()">🌙 Kurze Erholung</button>
-          <button class="danger-btn" onclick="enemyTurn()">👹 Gegnerzug</button>
-          <button class="util-btn" onclick="nextRound()">➡️ Nächste Runde</button>
+          <button class="fighter-btn" onclick="fighterAttack()">⚔️ Fighter Attack</button>
+          <button class="fighter-btn" onclick="secondWind()">💚 Second Wind</button>
+          <button class="fighter-btn" onclick="actionSurge()">⚡ Action Surge</button>
+          <button class="fighter-btn" onclick="shortRest()">🛌 Short Rest</button>
         </div>
 
         <div class="divider"></div>
 
-        <h3>Zustände</h3>
-        <div id="statusPills"></div>
-
-        <div class="divider"></div>
-        <div id="coreRuleSummary" class="small"></div>
+        <div id="fighterSummary" class="small"></div>
       </section>
 
       <section class="card span-6">
@@ -400,7 +418,39 @@
         </div>
       </section>
 
-      <section class="card span-7">
+      <section class="card span-4">
+        <h2>Runde / Zustände</h2>
+
+        <div class="three">
+          <div>
+            <div class="small">Runde</div>
+            <div style="font-size:28px;font-weight:700;"><span id="round">1</span></div>
+          </div>
+          <div>
+            <div class="small">Light genutzt</div>
+            <div style="font-size:18px;font-weight:700;" id="usedLight">Nein</div>
+          </div>
+          <div>
+            <div class="small">Veyr genutzt</div>
+            <div style="font-size:18px;font-weight:700;" id="usedVeyr">Nein</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <button class="util-btn" onclick="defensiveStance()">🛡 Defensive Haltung</button>
+          <button class="util-btn" onclick="shortRecovery()">🌙 Kurze Erholung</button>
+          <button class="danger-btn" onclick="enemyTurn()">👹 Gegnerzug</button>
+          <button class="util-btn" onclick="nextRound()">➡️ Nächste Runde</button>
+        </div>
+
+        <div class="divider"></div>
+        <div id="statusPills"></div>
+
+        <div class="divider"></div>
+        <div id="coreRuleSummary" class="small"></div>
+      </section>
+
+      <section class="card span-8">
         <h2>Gegner</h2>
 
         <div class="three">
@@ -462,7 +512,7 @@
         </div>
       </section>
 
-      <section class="card span-4">
+      <section class="card span-7">
         <h2>Lore / Notizen</h2>
         <textarea id="notesInput" placeholder="Eigene Notizen..."></textarea>
         <div class="row">
@@ -471,13 +521,13 @@
 
         <div class="divider"></div>
         <div class="small" id="characterLore">
-          Dark (Alrik) – Veyrbound Fighter.  
-          Light stabilisiert. Veyr zerstört und lockt.  
-          Jede Entscheidung zieht Blut, Kontrolle oder Narben nach sich.
+          Dark (Alrik) – Fighter / Veyrbound.  
+          Der Fighter trägt die Disziplin des Stahls.  
+          Der Veyrbound zerreißt diese Disziplin mit Focus, Hunger, Berserk und Narben.
         </div>
       </section>
 
-      <section class="card span-8">
+      <section class="card span-12">
         <h2>Kampflog</h2>
         <div class="row" style="margin-top:0;">
           <button class="util-btn" onclick="saveState()">💾 Speichern</button>
@@ -493,7 +543,7 @@
   </div>
 
   <script>
-    const STORAGE_KEY = "veyrbound_final_core_v1";
+    const STORAGE_KEY = "veyrbound_fighter_final_v1";
     let saveTimer = null;
 
     const defaultState = {
@@ -501,10 +551,18 @@
       hp: 13,
       maxHp: 33,
       acBase: 16,
+
+      fighterLevel: 3,
+      fightingStyle: "defense",
+      secondWindUsed: false,
+      actionSurgeUsed: false,
+      actionsRemaining: 1,
+
       focus: 3,
       hunger: 1,
       scars: 0,
       instability: 1,
+
       round: 1,
       usedLight: false,
       usedVeyr: false,
@@ -517,20 +575,24 @@
       nextAttackBonus: 0,
       nextDamageBonus: 0,
       legendaryBuffActive: false,
+
       selectedEnemyId: 1,
       notes: "",
+
       enemies: [
         { id: 1, name: "Hohlkreatur", hp: 30, maxHp: 30, ac: 13, atk: 4, dmg: "1d8+2", type: "normal", phase: 1 }
       ],
       nextEnemyId: 2,
+
       inventory: [
         { id: 1, name: "Heiltrank", type: "consumable", qty: 2, desc: "Heilt 8 HP." },
         { id: 2, name: "Fokus-Splitter", type: "consumable", qty: 1, desc: "Gibt 2 Focus zurück." },
         { id: 3, name: "Mal der Asche", type: "legendary", qty: 1, desc: "Einmal pro Runde: +2 Schaden auf Angriffe." }
       ],
+
       logs: [
-        "System online. Final Core initialisiert.",
-        "Dark (Alrik) hört den Veyr im Blut flüstern."
+        "System online. Fighter / Veyrbound Final initialisiert.",
+        "Dark (Alrik) spannt Stahl und Seele gegen das Dunkel."
       ]
     };
 
@@ -577,7 +639,7 @@
     function rollFormula(formula){
       const clean = String(formula).trim().toLowerCase().replace(/\s+/g,"");
       const m = clean.match(/^(\d*)d(\d+)([+-]\d+)?$/);
-      if(!m) return { valid:false, total:0, rolls:[], bonus:0 };
+      if(!m) return { valid:false, total:0, rolls:[], bonus:0, formula:clean };
       const count = Number(m[1] || 1);
       const die = Number(m[2]);
       const bonus = Number(m[3] || 0);
@@ -589,6 +651,21 @@
         total += r;
       }
       return { valid:true, total, rolls, bonus, formula:clean };
+    }
+
+    function rollWeaponDamage2d6(){
+      // Great Weapon Fighting: reroll 1s and 2s on weapon damage dice once
+      const style = state.fightingStyle;
+      let d1 = rollDie(6);
+      let d2 = rollDie(6);
+
+      if(style === "gwf"){
+        if(d1 <= 2) d1 = rollDie(6);
+        if(d2 <= 2) d2 = rollDie(6);
+      }
+
+      const base = d1 + d2 + 3;
+      return { total: base, rolls:[d1,d2] };
     }
 
     function scarControlPenalty(){ return state.scars >= 1 ? 1 : 0; }
@@ -611,12 +688,27 @@
       return state.hunger >= berserkThreshold() || state.instability >= 5;
     }
 
+    function getFightingStyleBonus(){
+      if(state.fightingStyle === "defense") return { ac:1, dmg:0 };
+      if(state.fightingStyle === "dueling") return { ac:0, dmg:2 };
+      if(state.fightingStyle === "gwf") return { ac:0, dmg:0 };
+      return { ac:0, dmg:0 };
+    }
+
+    function extraAttackCount(){
+      return state.fighterLevel >= 5 ? 2 : 1;
+    }
+
     function computedAC(){
       let ac = state.acBase;
+      const style = getFightingStyleBonus();
+
+      ac += style.ac;
       if(state.defensiveStance) ac += 2;
       if(state.lightField) ac += 2;
       if(state.switchPenaltyActive) ac -= 2;
       ac -= scarAcPenalty();
+
       return Math.max(1, ac);
     }
 
@@ -641,6 +733,7 @@
       state.scars = Math.max(0, state.scars);
       state.instability = Math.max(0, Math.min(state.instability, 5));
       state.round = Math.max(1, state.round);
+      state.actionsRemaining = Math.max(0, state.actionsRemaining);
 
       state.enemies.forEach(e => {
         e.hp = Math.max(0, e.hp);
@@ -669,6 +762,10 @@
       document.getElementById("usedLight").textContent = state.usedLight ? "Ja" : "Nein";
       document.getElementById("usedVeyr").textContent = state.usedVeyr ? "Ja" : "Nein";
       document.getElementById("notesInput").value = state.notes || "";
+      document.getElementById("fighterLevel").textContent = state.fighterLevel;
+      document.getElementById("actionsRemaining").textContent = state.actionsRemaining;
+      document.getElementById("fighterLevelSelect").value = String(state.fighterLevel);
+      document.getElementById("fightingStyleSelect").value = state.fightingStyle;
 
       const banner = document.getElementById("modeBanner");
       banner.className = "banner" + (isBerserk() ? " berserk" : "");
@@ -694,11 +791,15 @@
       document.getElementById("scarEffects").innerHTML = scarLines.join("<br>");
 
       const muts = getMutations();
-      document.getElementById("mutationEffects").innerHTML = muts.length ? muts.map(x => "• " + escapeHtml(x)).join("<br>") : "Keine aktiven Mutationen.";
+      document.getElementById("mutationEffects").innerHTML =
+        muts.length ? muts.map(x => "• " + escapeHtml(x)).join("<br>") : "Keine aktiven Mutationen.";
 
       const pills = [];
       pills.push(`<span class="pill gold">${state.usedLight ? "Light verbraucht" : "Light frei"}</span>`);
       pills.push(`<span class="pill bad">${state.usedVeyr ? "Veyr verbraucht" : "Veyr frei"}</span>`);
+      pills.push(`<span class="pill blue">Fighter Actions: ${state.actionsRemaining}</span>`);
+      if(state.secondWindUsed) pills.push(`<span class="pill bad">Second Wind verbraucht</span>`);
+      if(state.actionSurgeUsed) pills.push(`<span class="pill bad">Action Surge verbraucht</span>`);
       if(state.defensiveStance) pills.push(`<span class="pill good">Defensiv +2 AC</span>`);
       if(state.lightField) pills.push(`<span class="pill gold">Lichtfeld aktiv</span>`);
       if(state.switchPenaltyActive) pills.push(`<span class="pill bad">Switch-Penalty -2 AC</span>`);
@@ -718,6 +819,15 @@
         • Focus verfällt am Rundenende, wenn kein Light genutzt wurde<br>
         • Wechsel zwischen Light und Veyr in derselben Runde erzeugt Switch-Penalty (-2 AC bis nächste Runde)<br>
         • Light-Fehlschläge werden mit steigendem Hunger gefährlicher
+        `;
+
+      document.getElementById("fighterSummary").innerHTML =
+        `
+        Fighter-Stil: <strong>${escapeHtml(state.fightingStyle)}</strong><br>
+        Second Wind: ${state.secondWindUsed ? "verbraucht" : "verfügbar"}<br>
+        Action Surge: ${state.actionSurgeUsed ? "verbraucht" : "verfügbar"}<br>
+        Extra Attack: ${extraAttackCount() > 1 ? "aktiv" : "noch nicht"}<br>
+        Fighting Style Bonus: AC ${getFightingStyleBonus().ac >= 0 ? "+" : ""}${getFightingStyleBonus().ac}, Schaden ${getFightingStyleBonus().dmg >= 0 ? "+" : ""}${getFightingStyleBonus().dmg}
         `;
 
       renderEnemies();
@@ -823,6 +933,18 @@
       render();
     }
 
+    function setFighterLevel(){
+      state.fighterLevel = Number(document.getElementById("fighterLevelSelect").value) || 3;
+      log(`Fighter Level auf ${state.fighterLevel} gesetzt.`);
+      render();
+    }
+
+    function setFightingStyle(){
+      state.fightingStyle = document.getElementById("fightingStyleSelect").value;
+      log(`Fighting Style gewechselt zu ${state.fightingStyle}.`);
+      render();
+    }
+
     function changeHP(amount){
       const before = state.hp;
       state.hp += amount;
@@ -854,9 +976,50 @@
       render();
     }
 
+    function consumeFighterAction(label){
+      if(state.actionsRemaining <= 0){
+        log(`❌ Keine Fighter Action mehr verfügbar für ${label}.`);
+        return false;
+      }
+      state.actionsRemaining -= 1;
+      return true;
+    }
+
+    function secondWind(){
+      if(state.secondWindUsed){
+        log("❌ Second Wind bereits benutzt. Short Rest nötig.");
+        return;
+      }
+      const heal = rollDie(10) + state.fighterLevel;
+      state.hp = Math.min(state.maxHp, state.hp + heal);
+      state.secondWindUsed = true;
+      log(`💚 Second Wind: heilt ${heal} HP.`);
+      render();
+    }
+
+    function actionSurge(){
+      if(state.actionSurgeUsed){
+        log("❌ Action Surge bereits benutzt. Short Rest nötig.");
+        return;
+      }
+      state.actionSurgeUsed = true;
+      state.actionsRemaining += 1;
+      log("⚡ Action Surge: +1 zusätzliche Fighter Action in dieser Runde.");
+      render();
+    }
+
+    function shortRest(){
+      state.secondWindUsed = false;
+      state.actionSurgeUsed = false;
+      state.focus = Math.min(10, state.focus + 2);
+      state.hunger = Math.max(0, state.hunger - 1);
+      log("🛌 Short Rest: Second Wind und Action Surge erneuert, Focus +2, Hunger -1.");
+      render();
+    }
+
     function selectEnemy(id){
       state.selectedEnemyId = id;
-      log(`Ziel gewechselt.`);
+      log("Ziel gewechselt.");
       render();
     }
 
@@ -943,7 +1106,7 @@
           qty: 1,
           desc: "Einmal benutzen: Hunger -2 und +2 Schaden diese Runde."
         });
-        log(`Legendary Loot erhalten: Schwarze Reliquie.`);
+        log("Legendary Loot erhalten: Schwarze Reliquie.");
       } else if(Math.random() < 0.45){
         givePotion(false);
       }
@@ -1018,12 +1181,8 @@
         state.radiantControlBuff = 0;
       }
 
-      if(lightCheck && state.hunger >= 6){
-        dc += 2;
-      }
-      if(lightCheck && state.hunger >= 8){
-        dc += 2;
-      }
+      if(lightCheck && state.hunger >= 6) dc += 2;
+      if(lightCheck && state.hunger >= 8) dc += 2;
 
       if(total < dc){
         state.instability = Math.min(5, state.instability + 1);
@@ -1079,15 +1238,39 @@
       }
     }
 
-    function basicAttack(){
-      let bonus = 5 + state.nextAttackBonus;
-      let damage = rollFormula("2d6+3").total + state.nextDamageBonus;
-      if(isBerserk()){ bonus += 1; damage += 2; }
-      if(state.legendaryBuffActive) damage += 2;
-      if(state.instability >= 4) damage += 1;
+    function weaponAttackSingle(index, totalAttacks){
+      const enemy = getSelectedEnemy();
+      if(!enemy){
+        log("Kein Ziel vorhanden.");
+        return;
+      }
 
-      attackVsEnemy(bonus, damage, "⚔️ Standardangriff");
-      log(`⚔️ Schaden bei Treffer: ${damage}.`);
+      let attackBonus = 5 + state.nextAttackBonus;
+      let damageInfo = rollWeaponDamage2d6();
+      let damage = damageInfo.total + state.nextDamageBonus + getFightingStyleBonus().dmg;
+
+      if(isBerserk()){
+        attackBonus += 1;
+        damage += 2;
+      }
+      if(state.instability >= 4) damage += 1;
+      if(state.legendaryBuffActive) damage += 2;
+
+      const label = totalAttacks > 1 ? `⚔️ Fighter Attack ${index}/${totalAttacks}` : "⚔️ Fighter Attack";
+      const hit = attackVsEnemy(attackBonus, damage, label);
+      if(hit){
+        log(`${label}: Waffenschaden [${damageInfo.rolls.join(", ")}] + 3${getFightingStyleBonus().dmg ? " + Stil " + getFightingStyleBonus().dmg : ""}${state.nextDamageBonus ? " + Bonus " + state.nextDamageBonus : ""}${state.legendaryBuffActive ? " + Legendary 2" : ""}${isBerserk() ? " + Berserk 2" : ""} = ${damage}.`);
+      }
+    }
+
+    function fighterAttack(){
+      if(!consumeFighterAction("Fighter Attack")) return;
+
+      const attacks = extraAttackCount();
+      for(let i = 1; i <= attacks; i++){
+        if(!getSelectedEnemy()) break;
+        weaponAttackSingle(i, attacks);
+      }
 
       state.nextAttackBonus = 0;
       state.nextDamageBonus = 0;
@@ -1095,8 +1278,11 @@
     }
 
     function defensiveStance(){
+      if(!consumeFighterAction("Defensive Haltung")) return;
       if(state.defensiveStance){
         log("Defensive Haltung ist bereits aktiv.");
+        state.actionsRemaining += 1;
+        render();
         return;
       }
       state.defensiveStance = true;
@@ -1105,6 +1291,7 @@
     }
 
     function shortRecovery(){
+      if(!consumeFighterAction("Kurze Erholung")) return;
       state.focus = Math.min(10, state.focus + 2);
       state.hunger = Math.max(0, state.hunger - 1);
       log("🌙 Kurze Erholung: +2 Focus, -1 Hunger.");
@@ -1169,6 +1356,7 @@
       state.nextAttackBonus = 0;
       state.nextDamageBonus = 0;
       state.legendaryBuffActive = false;
+      state.actionsRemaining = 1;
 
       log(`➡️ Runde ${state.round} beginnt.`);
       if(state.enemies.length > 0){
@@ -1190,7 +1378,7 @@
       let damage = rollFormula("1d8+3").total;
       if(state.legendaryBuffActive) damage += 2;
       state.hunger = Math.max(0, state.hunger - 1);
-      log(`✨ Lichtstoß: Hunger -1.`);
+      log("✨ Lichtstoß: Hunger -1.");
       attackVsEnemy(5, damage, "✨ Lichtstoß");
       log(`✨ Schaden bei Treffer: ${damage}.`);
       render();
@@ -1292,7 +1480,7 @@
       if(state.legendaryBuffActive) damage += 2;
       if(state.instability >= 4) damage += 1;
 
-      log(`🩸 Veyr-Ausbruch: Hunger +2.`);
+      log("🩸 Veyr-Ausbruch: Hunger +2.");
       const enemy = getSelectedEnemy();
       if(enemy){
         damageEnemy(enemy.id, damage);
