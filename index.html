@@ -1,54 +1,868 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>Veyrbound App</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dark (Alrik) – Veyrbound Hardcore</title>
   <style>
-    body {
-      background-color: #0d0d0d;
-      color: #e6e6e6;
-      font-family: Arial, sans-serif;
-      padding: 20px;
+    :root{
+      --bg:#0a0a0a;
+      --panel:#171717;
+      --panel2:#1f1f1f;
+      --text:#ececec;
+      --muted:#a0a0a0;
+      --red:#c1121f;
+      --red2:#ff3b3b;
+      --gold:#d4af37;
+      --blue:#7dd3fc;
+      --green:#7ddc86;
+      --border:#333;
     }
 
-    h1 {
-      color: #ff4444;
+    * { box-sizing: border-box; }
+
+    body{
+      margin:0;
+      background:
+        radial-gradient(circle at top, rgba(193,18,31,0.15), transparent 30%),
+        linear-gradient(180deg, #050505, #0a0a0a 35%, #111);
+      color:var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      padding:16px;
     }
 
-    .box {
-      margin-top: 20px;
-      padding: 15px;
-      border: 1px solid #333;
-      border-radius: 10px;
-      background: #1a1a1a;
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
     }
 
-    .stat {
-      margin: 10px 0;
-      font-size: 18px;
+    h1,h2,h3{
+      margin:0 0 10px 0;
+    }
+
+    .title{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:16px;
+    }
+
+    .title h1{
+      color:var(--red2);
+      letter-spacing:1px;
+      text-shadow:0 0 12px rgba(255,59,59,0.25);
+    }
+
+    .subtitle{
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .banner{
+      padding:12px 14px;
+      border:1px solid var(--border);
+      border-radius:12px;
+      background:linear-gradient(180deg, #1a0f10, #120b0c);
+      margin-bottom:16px;
+      font-weight:bold;
+    }
+
+    .berserk{
+      border-color:#5e1116;
+      background:linear-gradient(180deg, #2a0d10, #17090b);
+      color:#ffd7d7;
+      box-shadow:0 0 18px rgba(255,0,0,0.15);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(12, 1fr);
+      gap:14px;
+    }
+
+    .card{
+      background:linear-gradient(180deg, var(--panel), var(--panel2));
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
+      box-shadow:0 6px 20px rgba(0,0,0,0.25);
+    }
+
+    .span-12{ grid-column:span 12; }
+    .span-8{ grid-column:span 8; }
+    .span-6{ grid-column:span 6; }
+    .span-4{ grid-column:span 4; }
+
+    @media (max-width:900px){
+      .span-8,.span-6,.span-4{ grid-column:span 12; }
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:10px;
+    }
+
+    .stat{
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:10px;
+      background:#111;
+    }
+
+    .stat-label{
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom:6px;
+      text-transform:uppercase;
+      letter-spacing:0.6px;
+    }
+
+    .stat-value{
+      font-size:24px;
+      font-weight:bold;
+    }
+
+    .small{
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .pill{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:bold;
+      border:1px solid var(--border);
+      margin-right:6px;
+      margin-bottom:6px;
+      background:#111;
+    }
+
+    .pill.light{ color:var(--gold); border-color:#5f5121; }
+    .pill.veyr{ color:#ff8f8f; border-color:#5f1f26; }
+    .pill.passive{ color:var(--blue); border-color:#234050; }
+
+    .row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:10px;
+    }
+
+    button{
+      appearance:none;
+      border:none;
+      border-radius:12px;
+      padding:10px 12px;
+      color:white;
+      background:#2a2a2a;
+      border:1px solid #444;
+      font-weight:bold;
+      cursor:pointer;
+    }
+
+    button:hover{
+      filter:brightness(1.08);
+    }
+
+    button.light-btn{
+      background:linear-gradient(180deg, #564615, #3d3110);
+      border-color:#7a6522;
+      color:#fff3c4;
+    }
+
+    button.veyr-btn{
+      background:linear-gradient(180deg, #60131b, #410d12);
+      border-color:#8f1e2b;
+      color:#ffd2d7;
+    }
+
+    button.util-btn{
+      background:linear-gradient(180deg, #2b2b2b, #1f1f1f);
+    }
+
+    button.danger-btn{
+      background:linear-gradient(180deg, #7c1720, #4a0d13);
+      border-color:#a71d2a;
+    }
+
+    input[type="number"]{
+      width:100%;
+      background:#101010;
+      color:white;
+      border:1px solid #444;
+      border-radius:10px;
+      padding:10px;
+    }
+
+    .section-title{
+      color:#f3f3f3;
+      margin-bottom:8px;
+    }
+
+    .log{
+      background:#0d0d0d;
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:10px;
+      max-height:320px;
+      overflow:auto;
+      line-height:1.45;
+      font-size:14px;
+    }
+
+    .log-entry{
+      padding:8px 0;
+      border-bottom:1px solid #222;
+    }
+
+    .log-entry:last-child{
+      border-bottom:none;
+    }
+
+    .accent-red{ color:#ff8f8f; }
+    .accent-gold{ color:#f7d774; }
+    .accent-blue{ color:#8ad8ff; }
+    .accent-green{ color:#97f0a0; }
+
+    .divider{
+      height:1px;
+      background:#2a2a2a;
+      margin:12px 0;
+    }
+
+    .muted{
+      color:var(--muted);
+    }
+
+    .two-col{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    @media (max-width:640px){
+      .two-col, .stats{
+        grid-template-columns:1fr;
+      }
     }
   </style>
 </head>
 <body>
+  <div class="wrap">
+    <div class="title">
+      <div>
+        <h1>DARK (ALRIK) – VEYRBOUND</h1>
+        <div class="subtitle">Hardcore Version • Berserk Modus • Character Sheet integriert</div>
+      </div>
+      <div>
+        <button class="util-btn" onclick="saveState()">💾 Speichern</button>
+        <button class="util-btn" onclick="loadState()">📂 Laden</button>
+        <button class="danger-btn" onclick="resetState()">♻️ Reset</button>
+      </div>
+    </div>
 
-<h1>DARK (ALRIK) – VEYRBOUND</h1>
+    <div id="modeBanner" class="banner">Status wird geladen…</div>
 
-<div class="box">
-  <h2>Status</h2>
-  <div class="stat">HP: 13 / 33</div>
-  <div class="stat">Focus 🌕: 0</div>
-  <div class="stat">Hunger 🌑: 0</div>
-  <div class="stat">Scars: 0</div>
-  <div class="stat">AC: ?</div>
-</div>
+    <div class="grid">
+      <div class="card span-4">
+        <h2 class="section-title">Charakterbogen</h2>
+        <div class="small">Klasse: Fighter 3 • Subclass: Veyrbound</div>
+        <div class="small">EXP: <span id="exp">450</span> / 900</div>
+        <div class="small">Initiative-System: Hybrid • Horrorstil: Berserk</div>
+        <div class="divider"></div>
 
-<div class="box">
-  <h2>Combat</h2>
-  <div class="stat">Attack: +5</div>
-  <div class="stat">Damage: 2W6 + 3</div>
-</div>
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-label">HP</div>
+            <div class="stat-value"><span id="hp">13</span> / <span id="maxHp">33</span></div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">AC</div>
+            <div class="stat-value"><span id="ac">16</span></div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Focus 🌕</div>
+            <div class="stat-value"><span id="focus">3</span></div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Hunger 🌑</div>
+            <div class="stat-value"><span id="hunger">1</span> / 10</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Scars 🩸</div>
+            <div class="stat-value"><span id="scars">0</span></div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Instabilität</div>
+            <div class="stat-value"><span id="instability">1</span> / 5</div>
+          </div>
+        </div>
 
-<p>Faustregel: Licht = Kontrolle • Veyr = Schaden</p>
+        <div class="row">
+          <button class="util-btn" onclick="changeHP(-3)">💥 -3 HP</button>
+          <button class="util-btn" onclick="changeHP(3)">💚 +3 HP</button>
+          <button class="util-btn" onclick="changeFocus(1)">🌕 +1 Focus</button>
+          <button class="util-btn" onclick="changeFocus(-1)">🌕 -1 Focus</button>
+          <button class="util-btn" onclick="changeHunger(1)">🌑 +1 Hunger</button>
+          <button class="util-btn" onclick="changeHunger(-1)">🌑 -1 Hunger</button>
+        </div>
 
+        <div class="divider"></div>
+
+        <div>
+          <div class="pill passive">Passiv: Licht stabilisiert</div>
+          <div class="pill passive">Passiv: Veyr ist riskant</div>
+          <div class="pill passive">1x Light + 1x Veyr pro Runde</div>
+          <div class="pill passive">Hunger-Eskalation ab 6</div>
+        </div>
+      </div>
+
+      <div class="card span-8">
+        <h2 class="section-title">Kampf & Runden</h2>
+        <div class="two-col">
+          <div>
+            <div class="small">Runde</div>
+            <div style="font-size:26px;font-weight:bold;"><span id="round">1</span></div>
+          </div>
+          <div>
+            <div class="small">Verwendet diese Runde</div>
+            <div style="font-size:16px;">
+              Light: <span id="usedLight">Nein</span><br>
+              Veyr: <span id="usedVeyr">Nein</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <button class="util-btn" onclick="nextRound()">➡️ Nächste Runde</button>
+          <button class="util-btn" onclick="basicAttack()">⚔️ Standardangriff</button>
+          <button class="util-btn" onclick="defensiveStance()">🛡 Defensive Haltung</button>
+          <button class="util-btn" onclick="longRestLite()">🌙 Kurze Erholung</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <h3>Gegner-Tracker</h3>
+        <div class="two-col">
+          <div>
+            <label class="small">Gegnername</label>
+            <input id="enemyNameInput" type="text" value="Hohlkreatur" style="width:100%;background:#101010;color:white;border:1px solid #444;border-radius:10px;padding:10px;">
+          </div>
+          <div>
+            <label class="small">Gegner-HP</label>
+            <input id="enemyHpInput" type="number" value="30">
+          </div>
+        </div>
+        <div class="row">
+          <button class="util-btn" onclick="setEnemy()">👹 Gegner setzen</button>
+          <button class="util-btn" onclick="enemyChangeHP(-5)">🩸 Gegner -5 HP</button>
+          <button class="util-btn" onclick="enemyChangeHP(-10)">💀 Gegner -10 HP</button>
+          <button class="util-btn" onclick="enemyChangeHP(5)">🩹 Gegner +5 HP</button>
+        </div>
+        <div class="small" style="margin-top:8px;">
+          Aktueller Gegner: <span id="enemyDisplay">Hohlkreatur (30 HP)</span>
+        </div>
+      </div>
+
+      <div class="card span-6">
+        <h2 class="section-title accent-gold">Light-Fähigkeiten</h2>
+        <div class="small">Kontrolle, Reinigung, Stabilisierung</div>
+
+        <div class="row">
+          <button class="light-btn" onclick="light_lichtstoss()">✨ Lichtstoß</button>
+          <button class="light-btn" onclick="light_lichtfeld()">🕯 Lichtfeld</button>
+          <button class="light-btn" onclick="light_reinigung()">🕊 Reinigung</button>
+          <button class="light-btn" onclick="light_strahlenderImpuls()">☀️ Strahlender Impuls</button>
+          <button class="light-btn" onclick="light_klarerGeist()">🧠 Klarer Geist</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="small">
+          <strong>Kosten/Idee:</strong><br>
+          Lichtfähigkeiten kosten Focus und helfen, Hunger / Instabilität / Kontrollverlust zu zügeln.
+        </div>
+      </div>
+
+      <div class="card span-6">
+        <h2 class="section-title accent-red">Veyr-Fähigkeiten</h2>
+        <div class="small">Schaden, Opfer, Hunger, Berserk</div>
+
+        <div class="row">
+          <button class="veyr-btn" onclick="veyr_hieb()">🌑 Veyr-Hieb</button>
+          <button class="veyr-btn" onclick="veyr_ausbruch()">🩸 Veyr-Ausbruch</button>
+          <button class="veyr-btn" onclick="veyr_blutopfer()">💉 Blutopfer</button>
+          <button class="veyr-btn" onclick="veyr_kontrollcheck()">🎲 Kontrollcheck</button>
+          <button class="veyr-btn" onclick="veyr_release()">💀 Berserk-Schub</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="small">
+          <strong>Regelkern:</strong><br>
+          Jede Veyr-Nutzung hat einen Preis: HP, Hunger oder Kontrollrisiko.
+        </div>
+      </div>
+
+      <div class="card span-4">
+        <h2 class="section-title">Werte & Kampfprofil</h2>
+        <div class="small">Basisangriff: +5</div>
+        <div class="small">Basisschaden: 2W6 + 3</div>
+        <div class="small">Light DC / Kontrolle: narrativ + Check</div>
+        <div class="small">Veyr-Risiko: steigt mit Hunger</div>
+        <div class="divider"></div>
+
+        <div class="pill light">Lichtstoß: 1 Focus</div>
+        <div class="pill light">Lichtfeld: 2 Focus</div>
+        <div class="pill light">Reinigung: 1 Focus</div>
+        <div class="pill light">Strahlender Impuls: 2 Focus</div>
+        <div class="pill light">Klarer Geist: 1 Focus</div>
+
+        <div class="divider"></div>
+
+        <div class="pill veyr">Veyr-Hieb: +1 Hunger oder -2 HP</div>
+        <div class="pill veyr">Ausbruch: +2 Hunger</div>
+        <div class="pill veyr">Blutopfer: -4 HP, +1 Focus</div>
+        <div class="pill veyr">Berserk-Schub: gefährlich</div>
+      </div>
+
+      <div class="card span-8">
+        <h2 class="section-title">Kampflog</h2>
+        <div id="log" class="log"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const defaultState = {
+      name: "Dark (Alrik)",
+      className: "Fighter 3 – Veyrbound",
+      exp: 450,
+      expMax: 900,
+      hp: 13,
+      maxHp: 33,
+      ac: 16,
+      focus: 3,
+      hunger: 1,
+      scars: 0,
+      instability: 1,
+      round: 1,
+      usedLight: false,
+      usedVeyr: false,
+      enemyName: "Hohlkreatur",
+      enemyHp: 30,
+      logs: [
+        "System online. Der Veyr flüstert im Hintergrund.",
+        "Dark (Alrik) betritt das Schlachtfeld."
+      ]
+    };
+
+    let state = {};
+
+    function clone(obj){
+      return JSON.parse(JSON.stringify(obj));
+    }
+
+    function rollDie(sides){
+      return Math.floor(Math.random() * sides) + 1;
+    }
+
+    function rollD20(){
+      return rollDie(20);
+    }
+
+    function roll2d6(){
+      return rollDie(6) + rollDie(6);
+    }
+
+    function clampState(){
+      state.hp = Math.max(0, Math.min(state.hp, state.maxHp));
+      state.focus = Math.max(0, Math.min(state.focus, 10));
+      state.hunger = Math.max(0, Math.min(state.hunger, 10));
+      state.scars = Math.max(0, state.scars);
+      state.instability = Math.max(0, Math.min(state.instability, 5));
+      state.enemyHp = Math.max(0, state.enemyHp);
+      state.round = Math.max(1, state.round);
+    }
+
+    function addLog(text){
+      const time = new Date().toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+      state.logs.unshift("[" + time + "] " + text);
+      state.logs = state.logs.slice(0, 120);
+      renderLog();
+      saveState();
+    }
+
+    function renderLog(){
+      const el = document.getElementById("log");
+      el.innerHTML = state.logs.map(item => `<div class="log-entry">${escapeHtml(item)}</div>`).join("");
+    }
+
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+    }
+
+    function render(){
+      clampState();
+
+      document.getElementById("exp").textContent = state.exp;
+      document.getElementById("hp").textContent = state.hp;
+      document.getElementById("maxHp").textContent = state.maxHp;
+      document.getElementById("ac").textContent = state.ac;
+      document.getElementById("focus").textContent = state.focus;
+      document.getElementById("hunger").textContent = state.hunger;
+      document.getElementById("scars").textContent = state.scars;
+      document.getElementById("instability").textContent = state.instability;
+      document.getElementById("round").textContent = state.round;
+      document.getElementById("usedLight").textContent = state.usedLight ? "Ja" : "Nein";
+      document.getElementById("usedVeyr").textContent = state.usedVeyr ? "Ja" : "Nein";
+      document.getElementById("enemyDisplay").textContent = `${state.enemyName} (${state.enemyHp} HP)`;
+
+      const banner = document.getElementById("modeBanner");
+      const berserk = isBerserk();
+      const unstable = state.hunger >= 6;
+
+      banner.className = "banner" + (berserk ? " berserk" : "");
+      if (berserk) {
+        banner.innerHTML = `💀 <strong>BERSERK MODUS AKTIV</strong> — Hunger ${state.hunger}/10. Kontrollverlust ist nah.`;
+      } else if (unstable) {
+        banner.innerHTML = `⚠️ Instabiler Zustand — Hunger ${state.hunger}/10. Ab jetzt greifen Eskalationswürfe.`;
+      } else {
+        banner.innerHTML = `🕯 Kontrollierter Zustand — Focus ${state.focus}, Hunger ${state.hunger}, Scars ${state.scars}.`;
+      }
+
+      renderLog();
+      saveState();
+    }
+
+    function isBerserk(){
+      return state.hunger >= 8 || state.instability >= 5;
+    }
+
+    function saveState(){
+      localStorage.setItem("veyrbound_hardcore_state", JSON.stringify(state));
+    }
+
+    function loadState(){
+      const raw = localStorage.getItem("veyrbound_hardcore_state");
+      if (raw) {
+        state = JSON.parse(raw);
+        addLog("Speicherstand geladen.");
+        render();
+      } else {
+        alert("Kein Speicherstand gefunden.");
+      }
+    }
+
+    function resetState(){
+      const ok = confirm("Wirklich alles zurücksetzen?");
+      if (!ok) return;
+      state = clone(defaultState);
+      render();
+      addLog("System zurückgesetzt. Alles beginnt erneut im Dunkel.");
+    }
+
+    function changeHP(amount){
+      const before = state.hp;
+      state.hp += amount;
+      clampState();
+      const diff = state.hp - before;
+      if (diff < 0) addLog(`Dark verliert ${Math.abs(diff)} HP.`);
+      if (diff > 0) addLog(`Dark erhält ${diff} HP zurück.`);
+      if (state.hp <= 0) addLog("☠️ Dark bricht zusammen.");
+      render();
+    }
+
+    function changeFocus(amount){
+      const before = state.focus;
+      state.focus += amount;
+      clampState();
+      const diff = state.focus - before;
+      if (diff < 0) addLog(`Focus sinkt um ${Math.abs(diff)}.`);
+      if (diff > 0) addLog(`Focus steigt um ${diff}.`);
+      render();
+    }
+
+    function changeHunger(amount){
+      const before = state.hunger;
+      state.hunger += amount;
+      clampState();
+      const diff = state.hunger - before;
+      if (diff < 0) addLog(`Hunger sinkt um ${Math.abs(diff)}.`);
+      if (diff > 0) addLog(`Hunger steigt um ${diff}.`);
+      render();
+    }
+
+    function setEnemy(){
+      const n = document.getElementById("enemyNameInput").value.trim();
+      const hp = parseInt(document.getElementById("enemyHpInput").value, 10);
+      state.enemyName = n || "Unbekannter Gegner";
+      state.enemyHp = isNaN(hp) ? 1 : Math.max(0, hp);
+      addLog(`Neuer Gegner gesetzt: ${state.enemyName} (${state.enemyHp} HP).`);
+      render();
+    }
+
+    function enemyChangeHP(amount){
+      const before = state.enemyHp;
+      state.enemyHp += amount;
+      clampState();
+      const diff = state.enemyHp - before;
+      if (diff < 0) addLog(`${state.enemyName} verliert ${Math.abs(diff)} HP.`);
+      if (diff > 0) addLog(`${state.enemyName} regeneriert ${diff} HP.`);
+      if (state.enemyHp <= 0) addLog(`👹 ${state.enemyName} wurde vernichtet.`);
+      render();
+    }
+
+    function spendLightSlot(cost){
+      if (state.usedLight) {
+        addLog("❌ Bereits eine Light-Fähigkeit in dieser Runde benutzt.");
+        return false;
+      }
+      if (state.focus < cost) {
+        addLog(`❌ Nicht genug Focus. Benötigt: ${cost}.`);
+        return false;
+      }
+      state.focus -= cost;
+      state.usedLight = true;
+      return true;
+    }
+
+    function spendVeyrSlot(){
+      if (state.usedVeyr) {
+        addLog("❌ Bereits eine Veyr-Fähigkeit in dieser Runde benutzt.");
+        return false;
+      }
+      state.usedVeyr = true;
+      return true;
+    }
+
+    function basicAttack(){
+      const d20 = rollD20();
+      let total = d20 + 5;
+      let dmg = roll2d6() + 3;
+
+      if (isBerserk()) {
+        dmg += 2;
+      }
+
+      let text = `⚔️ Standardangriff: Wurf ${d20} + 5 = ${total}, Schaden ${dmg}.`;
+      if (d20 === 20) text += " KRITISCHER TREFFER!";
+      if (d20 === 1) text += " Patzer.";
+      addLog(text);
+      enemyChangeHP(-dmg);
+      render();
+    }
+
+    function defensiveStance(){
+      state.ac += 2;
+      addLog("🛡 Defensive Haltung: AC +2 bis zur nächsten Runde.");
+      render();
+    }
+
+    function longRestLite(){
+      state.focus += 2;
+      state.hunger = Math.max(0, state.hunger - 1);
+      addLog("🌙 Kurze Erholung: +2 Focus, -1 Hunger.");
+      render();
+    }
+
+    function nextRound(){
+      if (state.ac > 16) state.ac = 16;
+
+      state.round += 1;
+      state.usedLight = false;
+      state.usedVeyr = false;
+
+      if (state.focus > 0 && !state.usedLight) {
+        // Keine automatische Focus-Reduktion hier, weil wir eben resetten.
+        // Decay wird narrativ über Hunger/Eskalation gehalten.
+      }
+
+      addLog(`➡️ Runde ${state.round} beginnt.`);
+
+      if (state.hunger >= 6) {
+        hungerEscalationCheck();
+      }
+
+      render();
+    }
+
+    function hungerEscalationCheck(){
+      const roll = rollD20();
+      const threshold = 10 + Math.min(state.hunger, 10) - 6; // ab 6 immer schlimmer
+      if (roll < threshold) {
+        state.instability += 1;
+        addLog(`🌑 Hunger-Eskalation: Kontrollwurf ${roll} gegen ${threshold} misslingt. Instabilität +1.`);
+        if (state.instability >= 5) {
+          state.scars += 1;
+          addLog("💀 Die Seele reißt auf. Scar +1.");
+        }
+      } else {
+        addLog(`🌕 Hunger-Eskalation: Kontrollwurf ${roll} gegen ${threshold} bestanden.`);
+      }
+    }
+
+    function veyrRiskCheck(bonusText=""){
+      const roll = rollD20();
+      const dc = 8 + state.hunger + state.scars;
+      if (roll < dc) {
+        state.instability += 1;
+        addLog(`💥 Kontrollverlust droht: Wurf ${roll} gegen ${dc} misslingt. Instabilität +1. ${bonusText}`);
+        if (state.hunger >= 8 || state.instability >= 5) {
+          state.scars += 1;
+          addLog("🩸 Das Veyr bohrt tiefer. Scar +1.");
+        }
+        return false;
+      } else {
+        addLog(`🎯 Kontrolle gehalten: Wurf ${roll} gegen ${dc} bestanden.`);
+        return true;
+      }
+    }
+
+    // LIGHT
+    function light_lichtstoss(){
+      if (!spendLightSlot(1)) { render(); return; }
+      const dmg = rollDie(8) + 3;
+      state.hunger = Math.max(0, state.hunger - 1);
+      addLog(`✨ Lichtstoß: ${dmg} Lichtschaden. Hunger -1.`);
+      enemyChangeHP(-dmg);
+      render();
+    }
+
+    function light_lichtfeld(){
+      if (!spendLightSlot(2)) { render(); return; }
+      state.ac += 2;
+      state.instability = Math.max(0, state.instability - 1);
+      addLog("🕯 Lichtfeld: AC +2 bis zur nächsten Runde, Instabilität -1.");
+      render();
+    }
+
+    function light_reinigung(){
+      if (!spendLightSlot(1)) { render(); return; }
+      state.hunger = Math.max(0, state.hunger - 2);
+      state.instability = Math.max(0, state.instability - 1);
+      addLog("🕊 Reinigung: Hunger -2, Instabilität -1.");
+      render();
+    }
+
+    function light_strahlenderImpuls(){
+      if (!spendLightSlot(2)) { render(); return; }
+      const atk = rollD20() + 5;
+      const dmg = roll2d6() + 4;
+      addLog(`☀️ Strahlender Impuls: Angriff ${atk}, Schaden ${dmg}.`);
+      enemyChangeHP(-dmg);
+      render();
+    }
+
+    function light_klarerGeist(){
+      if (!spendLightSlot(1)) { render(); return; }
+      state.instability = Math.max(0, state.instability - 2);
+      if (state.hunger >= 6) {
+        state.hunger -= 1;
+      }
+      addLog("🧠 Klarer Geist: Instabilität -2, bei hohem Hunger zusätzlich Hunger -1.");
+      render();
+    }
+
+    // VEYR
+    function veyr_hieb(){
+      if (!spendVeyrSlot()) { render(); return; }
+
+      const hpMode = confirm("Für Veyr-Hieb 2 HP opfern statt 1 Hunger gewinnen?");
+      if (hpMode) {
+        state.hp -= 2;
+        addLog("🌑 Veyr-Hieb: 2 HP geopfert.");
+      } else {
+        state.hunger += 1;
+        addLog("🌑 Veyr-Hieb: Hunger +1.");
+      }
+
+      const atk = rollD20() + 5;
+      let dmg = roll2d6() + 5 + Math.floor(state.hunger / 2);
+
+      if (isBerserk()) dmg += 3;
+
+      addLog(`🌑 Veyr-Hieb: Angriff ${atk}, Schaden ${dmg}.`);
+      enemyChangeHP(-dmg);
+      veyrRiskCheck();
+      render();
+    }
+
+    function veyr_ausbruch(){
+      if (!spendVeyrSlot()) { render(); return; }
+
+      state.hunger += 2;
+      const dmg = roll2d6() + roll2d6() + 4;
+      addLog(`🩸 Veyr-Ausbruch: Hunger +2. Gewaltiger Schaden ${dmg}.`);
+      enemyChangeHP(-dmg);
+      veyrRiskCheck("Der Ausbruch zerreißt die innere Grenze.");
+      render();
+    }
+
+    function veyr_blutopfer(){
+      if (!spendVeyrSlot()) { render(); return; }
+
+      state.hp -= 4;
+      state.focus += 1;
+      state.hunger += 1;
+      addLog("💉 Blutopfer: -4 HP, +1 Focus, +1 Hunger.");
+      veyrRiskCheck("Das Opfer hat Spuren hinterlassen.");
+      render();
+    }
+
+    function veyr_kontrollcheck(){
+      const roll = rollD20();
+      const dc = 10 + state.hunger + state.scars;
+      if (roll >= dc) {
+        state.instability = Math.max(0, state.instability - 1);
+        addLog(`🎲 Kontrollcheck bestanden: ${roll} gegen ${dc}. Instabilität -1.`);
+      } else {
+        state.instability += 1;
+        addLog(`🎲 Kontrollcheck misslungen: ${roll} gegen ${dc}. Instabilität +1.`);
+      }
+      render();
+    }
+
+    function veyr_release(){
+      if (!spendVeyrSlot()) { render(); return; }
+
+      state.hunger += 2;
+      state.instability += 1;
+
+      const atk = rollD20() + 7;
+      const dmg = roll2d6() + roll2d6() + 6;
+
+      addLog(`💀 Berserk-Schub: Hunger +2, Instabilität +1. Angriff ${atk}, Schaden ${dmg}.`);
+      enemyChangeHP(-dmg);
+
+      const ok = veyrRiskCheck("Der Berserk-Schub kratzt an der letzten Grenze.");
+      if (!ok) {
+        state.hp -= 2;
+        addLog("☠️ Rückstoß des Veyr: zusätzlich -2 HP.");
+      }
+      render();
+    }
+
+    // INIT
+    function init(){
+      const raw = localStorage.getItem("veyrbound_hardcore_state");
+      if (raw) {
+        state = JSON.parse(raw);
+      } else {
+        state = clone(defaultState);
+      }
+      render();
+    }
+
+    init();
+  </script>
 </body>
 </html>
