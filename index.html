@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dark (Alrik) – Veyrbound V4</title>
+  <title>Dark (Alrik) – Veyrbound Final Core</title>
   <style>
     :root{
-      --bg:#070707;
-      --panel:#151515;
-      --panel2:#1d1d1d;
+      --bg:#060606;
+      --panel:#141414;
+      --panel2:#1b1b1b;
       --line:#323232;
       --text:#f0ece6;
       --muted:#aba39a;
       --red:#d62c3a;
-      --red2:#ff7f8a;
+      --red2:#ff8e98;
       --gold:#d8b55a;
       --gold2:#f4de9f;
       --blue:#9edbff;
@@ -25,24 +25,28 @@
     body{
       margin:0;
       background:
-        radial-gradient(circle at top, rgba(214,44,58,.12), transparent 28%),
-        linear-gradient(180deg,#050505,#0a0a0a 40%,#101010);
+        radial-gradient(circle at top, rgba(214,44,58,.13), transparent 28%),
+        linear-gradient(180deg,#040404,#090909 42%,#0f0f0f);
       color:var(--text);
       font-family:Arial, Helvetica, sans-serif;
       padding:12px;
     }
 
-    .wrap{max-width:1300px;margin:0 auto}
+    .wrap{max-width:1400px;margin:0 auto}
 
     .topbar{
-      display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+      flex-wrap:wrap;
       margin-bottom:14px;
     }
 
     h1{
       margin:0;
       color:var(--red2);
-      font-size:clamp(1.5rem,4vw,2.4rem);
+      font-size:clamp(1.5rem,4vw,2.5rem);
       letter-spacing:1px;
       text-shadow:0 0 18px rgba(255,127,138,.18);
     }
@@ -99,7 +103,7 @@
     .span-8{grid-column:span 8}
     .span-9{grid-column:span 9}
 
-    @media (max-width:1100px){
+    @media (max-width:1180px){
       .span-3,.span-4,.span-5,.span-6,.span-7,.span-8,.span-9{grid-column:span 12}
     }
 
@@ -115,7 +119,9 @@
       margin-top:12px;
     }
 
-    @media (max-width:560px){ .stats{grid-template-columns:1fr} }
+    @media (max-width:560px){
+      .stats{grid-template-columns:1fr}
+    }
 
     .stat{
       background:#0f0f0f;
@@ -167,7 +173,7 @@
       font-size:15px;
     }
 
-    textarea{min-height:90px;resize:vertical}
+    textarea{min-height:95px;resize:vertical}
 
     button{
       appearance:none;
@@ -233,7 +239,7 @@
       border:1px solid var(--line);
       border-radius:14px;
       padding:10px;
-      max-height:420px;
+      max-height:440px;
       overflow:auto;
       font-size:14px;
       line-height:1.45;
@@ -278,7 +284,7 @@
     <div class="topbar">
       <div>
         <h1>DARK (ALRIK) – VEYRBOUND</h1>
-        <div class="sub">Version 4 • Dark World • Character Sheet • Multi-Enemy • Boss • Inventory • Legendary Items</div>
+        <div class="sub">Final Core • Dual Core Brutal • Berserk Mode • Scar Mutations • Multi Enemy • Boss • Inventory</div>
       </div>
       <div class="save" id="saveIndicator">Autosave bereit</div>
     </div>
@@ -330,6 +336,10 @@
 
         <div class="divider"></div>
         <div id="scarEffects" class="small"></div>
+
+        <div class="divider"></div>
+        <div class="small"><strong>Mutationen:</strong></div>
+        <div id="mutationEffects" class="small"></div>
       </section>
 
       <section class="card span-8">
@@ -361,11 +371,14 @@
 
         <h3>Zustände</h3>
         <div id="statusPills"></div>
+
+        <div class="divider"></div>
+        <div id="coreRuleSummary" class="small"></div>
       </section>
 
       <section class="card span-6">
         <h2 class="accent-gold">Light-Fähigkeiten</h2>
-        <div class="small">1x pro Runde • Fokus kostet • stabilisiert</div>
+        <div class="small">1x pro Runde • Focus-Kosten • Kontrolle / Reinigung / Schutz</div>
         <div class="row">
           <button class="light-btn" onclick="light_lichtstoss()">✨ Lichtstoß</button>
           <button class="light-btn" onclick="light_lichtfeld()">🕯 Lichtfeld</button>
@@ -377,7 +390,7 @@
 
       <section class="card span-6">
         <h2 class="accent-red">Veyr-Fähigkeiten</h2>
-        <div class="small">1x pro Runde • brutal • riskant</div>
+        <div class="small">1x pro Runde • immer mit Preis • Hunger, Blut, Risiko</div>
         <div class="row">
           <button class="veyr-btn" onclick="veyr_hieb()">🌑 Veyr-Hieb</button>
           <button class="veyr-btn" onclick="veyr_ausbruch()">🩸 Veyr-Ausbruch</button>
@@ -450,10 +463,17 @@
       </section>
 
       <section class="card span-4">
-        <h2>Notizen</h2>
+        <h2>Lore / Notizen</h2>
         <textarea id="notesInput" placeholder="Eigene Notizen..."></textarea>
         <div class="row">
           <button class="util-btn" onclick="saveNotes()">📝 Notizen speichern</button>
+        </div>
+
+        <div class="divider"></div>
+        <div class="small" id="characterLore">
+          Dark (Alrik) – Veyrbound Fighter.  
+          Light stabilisiert. Veyr zerstört und lockt.  
+          Jede Entscheidung zieht Blut, Kontrolle oder Narben nach sich.
         </div>
       </section>
 
@@ -473,7 +493,7 @@
   </div>
 
   <script>
-    const STORAGE_KEY = "veyrbound_v4_state";
+    const STORAGE_KEY = "veyrbound_final_core_v1";
     let saveTimer = null;
 
     const defaultState = {
@@ -490,7 +510,14 @@
       usedVeyr: false,
       defensiveStance: false,
       lightField: false,
-      selectedEnemyId: null,
+      switchPenaltyActive: false,
+      focusDecayPending: true,
+      clearMindBuff: false,
+      radiantControlBuff: 0,
+      nextAttackBonus: 0,
+      nextDamageBonus: 0,
+      legendaryBuffActive: false,
+      selectedEnemyId: 1,
       notes: "",
       enemies: [
         { id: 1, name: "Hohlkreatur", hp: 30, maxHp: 30, ac: 13, atk: 4, dmg: "1d8+2", type: "normal", phase: 1 }
@@ -499,12 +526,11 @@
       inventory: [
         { id: 1, name: "Heiltrank", type: "consumable", qty: 2, desc: "Heilt 8 HP." },
         { id: 2, name: "Fokus-Splitter", type: "consumable", qty: 1, desc: "Gibt 2 Focus zurück." },
-        { id: 3, name: "Mal der Asche", type: "legendary", qty: 1, desc: "Einmal pro Kampf: +2 Schaden auf alle Angriffe dieser Runde." }
+        { id: 3, name: "Mal der Asche", type: "legendary", qty: 1, desc: "Einmal pro Runde: +2 Schaden auf Angriffe." }
       ],
-      legendaryBuffActive: false,
       logs: [
-        "System online. Version 4 erwacht.",
-        "Dark (Alrik) tritt in die finstere Welt ein."
+        "System online. Final Core initialisiert.",
+        "Dark (Alrik) hört den Veyr im Blut flüstern."
       ]
     };
 
@@ -533,7 +559,7 @@
     function log(msg){
       const t = new Date().toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
       state.logs.unshift("[" + t + "] " + msg);
-      state.logs = state.logs.slice(0, 220);
+      state.logs = state.logs.slice(0, 260);
       renderLog();
       autosave();
     }
@@ -571,6 +597,16 @@
     function veyrRiskBonus(){ return state.scars >= 4 ? 2 : 0; }
     function berserkThreshold(){ return state.scars >= 5 ? 7 : 8; }
 
+    function getMutations(){
+      const mutations = [];
+      if(state.scars >= 2) mutations.push("Zitternde Wachsamkeit: -1 AC");
+      if(state.scars >= 4) mutations.push("Abgrundsflüstern: Veyr-Risiko +2 DC");
+      if(state.scars >= 5) mutations.push("Aufgerissener Kern: Berserk früher");
+      if(state.scars >= 6) mutations.push("Rissige Seele: Zufällige Kontrollausbrüche");
+      if(state.instability >= 4) mutations.push("Blutrauschen: Angriffe +1 Schaden im Berserk");
+      return mutations;
+    }
+
     function isBerserk(){
       return state.hunger >= berserkThreshold() || state.instability >= 5;
     }
@@ -579,6 +615,7 @@
       let ac = state.acBase;
       if(state.defensiveStance) ac += 2;
       if(state.lightField) ac += 2;
+      if(state.switchPenaltyActive) ac -= 2;
       ac -= scarAcPenalty();
       return Math.max(1, ac);
     }
@@ -604,6 +641,7 @@
       state.scars = Math.max(0, state.scars);
       state.instability = Math.max(0, Math.min(state.instability, 5));
       state.round = Math.max(1, state.round);
+
       state.enemies.forEach(e => {
         e.hp = Math.max(0, e.hp);
         e.maxHp = Math.max(1, e.maxHp || e.hp || 1);
@@ -611,6 +649,7 @@
         e.atk = Math.max(0, e.atk);
         e.phase = e.phase || 1;
       });
+
       state.inventory.forEach(i => i.qty = Math.max(0, i.qty));
       ensureSelectedEnemy();
     }
@@ -650,19 +689,36 @@
         if(state.scars >= 3) scarLines.push("• Light kostet +1 Focus");
         if(state.scars >= 4) scarLines.push("• Veyr-Risiko +2 DC");
         if(state.scars >= 5) scarLines.push("• Berserk-Schwelle sinkt");
-        if(state.scars >= 6) scarLines.push("• Zufällige Kontrollausbrüche möglich");
+        if(state.scars >= 6) scarLines.push("• Zufällige Kontrollausbrüche");
       }
       document.getElementById("scarEffects").innerHTML = scarLines.join("<br>");
+
+      const muts = getMutations();
+      document.getElementById("mutationEffects").innerHTML = muts.length ? muts.map(x => "• " + escapeHtml(x)).join("<br>") : "Keine aktiven Mutationen.";
 
       const pills = [];
       pills.push(`<span class="pill gold">${state.usedLight ? "Light verbraucht" : "Light frei"}</span>`);
       pills.push(`<span class="pill bad">${state.usedVeyr ? "Veyr verbraucht" : "Veyr frei"}</span>`);
       if(state.defensiveStance) pills.push(`<span class="pill good">Defensiv +2 AC</span>`);
       if(state.lightField) pills.push(`<span class="pill gold">Lichtfeld aktiv</span>`);
+      if(state.switchPenaltyActive) pills.push(`<span class="pill bad">Switch-Penalty -2 AC</span>`);
+      if(state.focusDecayPending) pills.push(`<span class="pill blue">Focus-Decay aktiv</span>`);
+      if(state.clearMindBuff) pills.push(`<span class="pill gold">Klarer Geist Buff</span>`);
+      if(state.radiantControlBuff > 0) pills.push(`<span class="pill gold">Kontrollbonus +${state.radiantControlBuff}</span>`);
       if(state.hunger >= 6) pills.push(`<span class="pill bad">Eskalation aktiv</span>`);
       if(isBerserk()) pills.push(`<span class="pill bad">BERSERK</span>`);
       if(state.legendaryBuffActive) pills.push(`<span class="pill blue">Legendary Buff aktiv</span>`);
       document.getElementById("statusPills").innerHTML = pills.join("");
+
+      document.getElementById("coreRuleSummary").innerHTML =
+        `
+        Dual Core Brutal aktiv.<br>
+        • 1x Light + 1x Veyr pro Runde<br>
+        • Veyr kostet immer HP oder Hunger<br>
+        • Focus verfällt am Rundenende, wenn kein Light genutzt wurde<br>
+        • Wechsel zwischen Light und Veyr in derselben Runde erzeugt Switch-Penalty (-2 AC bis nächste Runde)<br>
+        • Light-Fehlschläge werden mit steigendem Hunger gefährlicher
+        `;
 
       renderEnemies();
       renderInventory();
@@ -805,11 +861,12 @@
     }
 
     function addEnemy(){
+      const hpVal = Number(document.getElementById("enemyHpInput").value) || 20;
       const enemy = {
         id: state.nextEnemyId++,
         name: document.getElementById("enemyNameInput").value.trim() || "Unbekannter Gegner",
-        hp: Number(document.getElementById("enemyHpInput").value) || 20,
-        maxHp: Number(document.getElementById("enemyHpInput").value) || 20,
+        hp: hpVal,
+        maxHp: hpVal,
         ac: Number(document.getElementById("enemyAcInput").value) || 12,
         atk: Number(document.getElementById("enemyAtkInput").value) || 3,
         dmg: document.getElementById("enemyDmgInput").value.trim() || "1d6+1",
@@ -884,11 +941,23 @@
           name: "Schwarze Reliquie",
           type: "legendary",
           qty: 1,
-          desc: "Einmal benutzen: Hunger -2 und +3 Schaden diese Runde."
+          desc: "Einmal benutzen: Hunger -2 und +2 Schaden diese Runde."
         });
         log(`Legendary Loot erhalten: Schwarze Reliquie.`);
       } else if(Math.random() < 0.45){
         givePotion(false);
+      }
+    }
+
+    function registerStyleUse(type){
+      if(type === "light"){
+        if(state.usedVeyr) state.switchPenaltyActive = true;
+        state.usedLight = true;
+        state.focusDecayPending = false;
+      }
+      if(type === "veyr"){
+        if(state.usedLight) state.switchPenaltyActive = true;
+        state.usedVeyr = true;
       }
     }
 
@@ -903,7 +972,7 @@
         return false;
       }
       state.focus -= finalCost;
-      state.usedLight = true;
+      registerStyleUse("light");
       return true;
     }
 
@@ -912,7 +981,7 @@
         log("❌ Bereits eine Veyr-Fähigkeit in dieser Runde benutzt.");
         return false;
       }
-      state.usedVeyr = true;
+      registerStyleUse("veyr");
       return true;
     }
 
@@ -934,25 +1003,63 @@
       return hit;
     }
 
-    function controlCheck(dcBase, label){
+    function controlCheck(dcBase, label, lightCheck = false){
       const roll = rollD20();
-      const dc = dcBase + state.hunger + state.scars + veyrRiskBonus();
-      const total = roll - scarControlPenalty();
+      let dc = dcBase + state.hunger + state.scars + (lightCheck ? 0 : veyrRiskBonus());
+      let total = roll - scarControlPenalty();
+
+      if(state.clearMindBuff){
+        total += 4;
+        state.clearMindBuff = false;
+      }
+
+      if(state.radiantControlBuff > 0){
+        total += state.radiantControlBuff;
+        state.radiantControlBuff = 0;
+      }
+
+      if(lightCheck && state.hunger >= 6){
+        dc += 2;
+      }
+      if(lightCheck && state.hunger >= 8){
+        dc += 2;
+      }
+
       if(total < dc){
-        state.instability += 1;
-        log(`${label}: Kontrollwurf ${roll}${scarControlPenalty() ? " - " + scarControlPenalty() : ""} = ${total} gegen ${dc} misslingt. Instabilität +1.`);
-        if(isBerserk()){
+        state.instability = Math.min(5, state.instability + 1);
+        log(`${label}: Kontrollwurf ${roll} = ${total} gegen ${dc} misslingt. Instabilität +1.`);
+
+        if(lightCheck){
+          if(state.hunger >= 7){
+            state.hunger = Math.min(10, state.hunger + 1);
+            log("🌑 Light-Fehlschlag unter hohem Hunger: Hunger +1.");
+          }
+          if(state.hunger >= 9){
+            state.scars += 1;
+            log("🩸 Katastrophaler Light-Fehlschlag: Scar +1.");
+          }
+        }
+
+        if(!lightCheck && isBerserk()){
           state.scars += 1;
           log("💀 Berserk verschlimmert den Riss. Scar +1.");
         }
+
         if(state.scars >= 6 && Math.random() < 0.35){
           state.hp = Math.max(0, state.hp - 2);
           log("🩸 Zufälliger Kontrollausbruch: Dark verliert 2 HP.");
         }
         return false;
       } else {
-        log(`${label}: Kontrollwurf ${roll}${scarControlPenalty() ? " - " + scarControlPenalty() : ""} = ${total} gegen ${dc} bestanden.`);
+        log(`${label}: Kontrollwurf ${roll} = ${total} gegen ${dc} bestanden.`);
         return true;
+      }
+    }
+
+    function applyFocusDecay(){
+      if(state.focusDecayPending && state.focus > 0){
+        state.focus = Math.max(0, state.focus - 1);
+        log("🌕 Focus-Decay: Kein Light genutzt. Focus -1.");
       }
     }
 
@@ -961,7 +1068,7 @@
       const roll = rollD20();
       const dc = 10 + (state.hunger - 6) + scarControlPenalty();
       if(roll < dc){
-        state.instability += 1;
+        state.instability = Math.min(5, state.instability + 1);
         log(`🌑 Hunger-Eskalation: ${roll} gegen ${dc} misslingt. Instabilität +1.`);
         if(state.instability >= 5){
           state.scars += 1;
@@ -973,12 +1080,17 @@
     }
 
     function basicAttack(){
-      let bonus = 5;
-      let damage = rollFormula("2d6+3").total;
+      let bonus = 5 + state.nextAttackBonus;
+      let damage = rollFormula("2d6+3").total + state.nextDamageBonus;
       if(isBerserk()){ bonus += 1; damage += 2; }
       if(state.legendaryBuffActive) damage += 2;
+      if(state.instability >= 4) damage += 1;
+
       attackVsEnemy(bonus, damage, "⚔️ Standardangriff");
       log(`⚔️ Schaden bei Treffer: ${damage}.`);
+
+      state.nextAttackBonus = 0;
+      state.nextDamageBonus = 0;
       render();
     }
 
@@ -1010,7 +1122,8 @@
 
         const roll = rollD20();
         let atkBonus = enemy.atk;
-        let damage = rollFormula(enemy.dmg).valid ? rollFormula(enemy.dmg).total : 4;
+        let damageRoll = rollFormula(enemy.dmg);
+        let damage = damageRoll.valid ? damageRoll.total : 4;
 
         if(enemy.type === "aggressive") damage += 2;
         if(enemy.type === "horror"){
@@ -1041,15 +1154,23 @@
     }
 
     function nextRound(){
+      applyFocusDecay();
+      hungerEscalationCheck();
+
       state.round += 1;
       state.usedLight = false;
       state.usedVeyr = false;
       state.defensiveStance = false;
       state.lightField = false;
+      state.switchPenaltyActive = false;
+      state.focusDecayPending = true;
+      state.clearMindBuff = false;
+      state.radiantControlBuff = 0;
+      state.nextAttackBonus = 0;
+      state.nextDamageBonus = 0;
       state.legendaryBuffActive = false;
 
       log(`➡️ Runde ${state.round} beginnt.`);
-      hungerEscalationCheck();
       if(state.enemies.length > 0){
         enemyTurn();
       }
@@ -1059,6 +1180,13 @@
     // LIGHT
     function light_lichtstoss(){
       if(!spendLight(1)){ render(); return; }
+      const ok = controlCheck(8, "Lichtstoß", true);
+      if(!ok){
+        log("✨ Lichtstoß scheitert im Flackern.");
+        render();
+        return;
+      }
+
       let damage = rollFormula("1d8+3").total;
       if(state.legendaryBuffActive) damage += 2;
       state.hunger = Math.max(0, state.hunger - 1);
@@ -1070,6 +1198,13 @@
 
     function light_lichtfeld(){
       if(!spendLight(2)){ render(); return; }
+      const ok = controlCheck(8, "Lichtfeld", true);
+      if(!ok){
+        log("🕯 Lichtfeld bricht zusammen.");
+        render();
+        return;
+      }
+
       state.lightField = true;
       state.instability = Math.max(0, state.instability - 1);
       log("🕯 Lichtfeld: +2 AC bis zur nächsten Runde. Instabilität -1.");
@@ -1078,6 +1213,13 @@
 
     function light_reinigung(){
       if(!spendLight(1)){ render(); return; }
+      const ok = controlCheck(8, "Reinigung", true);
+      if(!ok){
+        log("🕊 Reinigung misslingt. Das Dunkel bleibt.");
+        render();
+        return;
+      }
+
       state.hunger = Math.max(0, state.hunger - 2);
       state.instability = Math.max(0, state.instability - 1);
       log("🕊 Reinigung: Hunger -2, Instabilität -1.");
@@ -1086,18 +1228,34 @@
 
     function light_strahlenderImpuls(){
       if(!spendLight(2)){ render(); return; }
+      const ok = controlCheck(8, "Strahlender Impuls", true);
+      if(!ok){
+        log("☀️ Strahlender Impuls zerreißt im inneren Rauschen.");
+        render();
+        return;
+      }
+
       let damage = rollFormula("2d6+4").total;
       if(state.legendaryBuffActive) damage += 2;
       attackVsEnemy(6, damage, "☀️ Strahlender Impuls");
-      log(`☀️ Schaden bei Treffer: ${damage}.`);
+      state.radiantControlBuff = 2;
+      log(`☀️ Schaden bei Treffer: ${damage}. Nächster Kontrollcheck +2.`);
       render();
     }
 
     function light_klarerGeist(){
       if(!spendLight(1)){ render(); return; }
+      const ok = controlCheck(8, "Klarer Geist", true);
+      if(!ok){
+        log("🧠 Klarer Geist misslingt.");
+        render();
+        return;
+      }
+
       state.instability = Math.max(0, state.instability - 2);
       if(state.hunger >= 6) state.hunger = Math.max(0, state.hunger - 1);
-      log("🧠 Klarer Geist: Instabilität -2, bei hohem Hunger zusätzlich Hunger -1.");
+      state.clearMindBuff = true;
+      log("🧠 Klarer Geist: Instabilität -2, bei hohem Hunger Hunger -1. Nächster Kontrollcheck +4.");
       render();
     }
 
@@ -1118,10 +1276,11 @@
       let damage = rollFormula("2d6+5").total;
       if(isBerserk()) damage += 3;
       if(state.legendaryBuffActive) damage += 2;
+      if(state.instability >= 4) damage += 1;
 
       attackVsEnemy(bonus, damage, "🌑 Veyr-Hieb");
       log(`🌑 Schaden bei Treffer: ${damage}.`);
-      controlCheck(8, "Veyr-Hieb");
+      controlCheck(8, "Veyr-Hieb", false);
       render();
     }
 
@@ -1131,6 +1290,8 @@
       state.hunger = Math.min(10, state.hunger + 2);
       let damage = rollFormula("4d6+4").total;
       if(state.legendaryBuffActive) damage += 2;
+      if(state.instability >= 4) damage += 1;
+
       log(`🩸 Veyr-Ausbruch: Hunger +2.`);
       const enemy = getSelectedEnemy();
       if(enemy){
@@ -1139,7 +1300,7 @@
         log("Kein Ziel vorhanden.");
       }
       log(`🩸 Sofortschaden: ${damage}.`);
-      controlCheck(9, "Veyr-Ausbruch");
+      controlCheck(9, "Veyr-Ausbruch", false);
       render();
     }
 
@@ -1150,20 +1311,30 @@
       state.focus = Math.min(10, state.focus + 1);
       state.hunger = Math.min(10, state.hunger + 1);
       log("💉 Blutopfer: -4 HP, +1 Focus, +1 Hunger.");
-      controlCheck(7, "Blutopfer");
+      controlCheck(7, "Blutopfer", false);
       render();
     }
 
     function veyr_kontrollcheck(){
       const roll = rollD20();
-      const dc = 10 + state.hunger + state.scars;
-      const total = roll - scarControlPenalty();
+      let dc = 10 + state.hunger + state.scars;
+      let total = roll - scarControlPenalty();
+
+      if(state.clearMindBuff){
+        total += 4;
+        state.clearMindBuff = false;
+      }
+      if(state.radiantControlBuff > 0){
+        total += state.radiantControlBuff;
+        state.radiantControlBuff = 0;
+      }
+
       if(total >= dc){
         state.instability = Math.max(0, state.instability - 1);
-        log(`🎲 Kontrollcheck bestanden: ${roll}${scarControlPenalty() ? " - " + scarControlPenalty() : ""} = ${total} gegen ${dc}. Instabilität -1.`);
+        log(`🎲 Kontrollcheck bestanden: ${roll} = ${total} gegen ${dc}. Instabilität -1.`);
       } else {
         state.instability = Math.min(5, state.instability + 1);
-        log(`🎲 Kontrollcheck misslungen: ${roll}${scarControlPenalty() ? " - " + scarControlPenalty() : ""} = ${total} gegen ${dc}. Instabilität +1.`);
+        log(`🎲 Kontrollcheck misslungen: ${roll} = ${total} gegen ${dc}. Instabilität +1.`);
       }
       render();
     }
@@ -1177,10 +1348,11 @@
       let damage = rollFormula("4d6+6").total;
       let bonus = 7 + Math.floor(state.hunger / 2);
       if(state.legendaryBuffActive) damage += 2;
+      if(state.instability >= 4) damage += 1;
 
       attackVsEnemy(bonus, damage, "💀 Berserk-Schub");
       log(`💀 Schaden bei Treffer: ${damage}.`);
-      const ok = controlCheck(10, "Berserk-Schub");
+      const ok = controlCheck(10, "Berserk-Schub", false);
       if(!ok){
         state.hp = Math.max(0, state.hp - 2);
         log("☠️ Rückstoß des Veyr: zusätzlich -2 HP.");
@@ -1208,12 +1380,21 @@
       } else if(item.name === "Mal der Asche"){
         state.legendaryBuffActive = true;
         item.qty -= 1;
-        log("🗡 Mal der Asche aktiviert: +2 Schaden auf Angriffe dieser Runde.");
+        log("🗡 Mal der Asche aktiviert: +2 Schaden diese Runde.");
       } else if(item.name === "Schwarze Reliquie"){
         state.hunger = Math.max(0, state.hunger - 2);
         state.legendaryBuffActive = true;
         item.qty -= 1;
         log("🗡 Schwarze Reliquie aktiviert: Hunger -2 und +2 Schaden diese Runde.");
+      } else if(item.name === "Schwarze Klinge von Veyr"){
+        state.nextDamageBonus += 4;
+        item.qty -= 1;
+        log("🗡 Schwarze Klinge von Veyr: nächster Angriff +4 Schaden.");
+      } else if(item.name === "Reliquie des Stillen Mondes"){
+        state.hunger = Math.max(0, state.hunger - 2);
+        state.instability = Math.max(0, state.instability - 1);
+        item.qty -= 1;
+        log("🗡 Reliquie des Stillen Mondes: Hunger -2, Instabilität -1.");
       }
 
       render();
@@ -1236,25 +1417,20 @@
     }
 
     function giveLegendary(){
-      const names = [
-        "Mal der Asche",
-        "Schwarze Klinge von Veyr",
-        "Reliquie des Stillen Mondes"
+      const pool = [
+        { name:"Mal der Asche", desc:"Einmal pro Runde: +2 Schaden auf Angriffe." },
+        { name:"Schwarze Klinge von Veyr", desc:"Benutzen: nächster Angriff +4 Schaden." },
+        { name:"Reliquie des Stillen Mondes", desc:"Benutzen: Hunger -2, Instabilität -1." }
       ];
-      const name = names[Math.floor(Math.random() * names.length)];
-      let desc = "Legendärer Effekt.";
-      if(name === "Mal der Asche") desc = "Einmal pro Kampf: +2 Schaden auf alle Angriffe dieser Runde.";
-      if(name === "Schwarze Klinge von Veyr") desc = "Benutzen: nächster Veyr-Angriff +4 Schaden.";
-      if(name === "Reliquie des Stillen Mondes") desc = "Benutzen: Hunger -2, Instabilität -1.";
-
+      const item = pool[Math.floor(Math.random() * pool.length)];
       state.inventory.push({
         id: Date.now() + Math.random(),
-        name,
-        type: "legendary",
-        qty: 1,
-        desc
+        name:item.name,
+        type:"legendary",
+        qty:1,
+        desc:item.desc
       });
-      log(`🗡 Legendary Item gefunden: ${name}.`);
+      log(`🗡 Legendary Item gefunden: ${item.name}.`);
       render();
     }
 
